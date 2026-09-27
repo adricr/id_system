@@ -7,6 +7,7 @@ from torch.utils.data import DataLoader, Dataset
 from torchvision.io import ImageReadMode, decode_image
 from torchvision.models import MobileNet_V3_Small_Weights, mobilenet_v3_small
 from torchvision.transforms import v2
+from early_stopping import EarlyStopping
 
 # Repo layout: <project_root>/src/id_system/id_system.py, dataset at <project_root>/plants1
 PROJECT_DIR = Path(__file__).resolve().parents[2]
@@ -16,7 +17,7 @@ METADATA_PATH = IMAGE_DIR / "metadata.csv"
 
 LEARNING_RATE = 1e-3
 BATCH_SIZE = 32
-EPOCHS = 20
+EPOCHS = 200
 
 
 class PlantDataset(Dataset):
@@ -97,23 +98,23 @@ def train_loop(dataloader, model, loss_fn, optimizer, device):
             print(f"loss: {loss_value:>7f}  [{current:>5d}/{size:>5d}]")
 
 
-def test_loop(dataloader, model, loss_fn, device):
+def val_loop(dataloader, model, loss_fn, device):
     model.eval()
     size = len(dataloader.dataset)
     num_batches = len(dataloader)
-    test_loss, correct = 0, 0
+    val_loss, correct = 0, 0
 
     with torch.no_grad():
         for X, y in dataloader:
             X, y = X.to(device), y.to(device)
             pred = model(X)
-            test_loss += loss_fn(pred, y).item()
+            val_loss += loss_fn(pred, y).item()
             correct += (pred.argmax(1) == y).type(torch.float).sum().item()
 
-    test_loss /= num_batches
+    val_loss /= num_batches
     correct /= size
-    print(f"Test Error: \n Accuracy: {(100 * correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
-
+    print(f"Test Error: \n Accuracy: {(100 * correct):>0.1f}%, Avg loss: {val_loss:>8f} \n")
+    return val_loss
 
 def main() -> None:
     print("PyTorch:", torch.__version__)
@@ -132,15 +133,21 @@ def main() -> None:
 
     model, trained_epochs = build_model(num_classes, device)
     loss_fn = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(model.parameters(), lr=LEARNING_RATE)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE)
+    early_stopping = EarlyStopping(4,0.01)
+    total_epochs = 0
     print(f"Let's run {EPOCHS} epochs")
     for epoch in range(trained_epochs + 1, trained_epochs + EPOCHS + 1):
         print(f"Epoch {epoch}\n-------------------------------")
         train_loop(train_dataloader, model, loss_fn, optimizer, device)
-        test_loop(val_dataloader, model, loss_fn, device)
-    total_epochs = trained_epochs + EPOCHS
+        early_stopping(val_loop(val_dataloader, model, loss_fn, device), model)
+        if early_stopping.early_stop:
+            total_epochs = epoch
+            print("Early stop to avoid overfitting")
+            break
+        total_epochs = trained_epochs + EPOCHS
+    early_stopping.load_best_model(model)
     print(f"Done! Total epochs trained: {total_epochs}")
-
     model_path = PROCESSED_DIR / "model.pt"
     torch.save({
         "epoch": total_epochs,
