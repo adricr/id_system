@@ -1,5 +1,5 @@
 label_index,dir_id,species,common_name,train_count,valid_count,test_count,total_count
-0,5361899,ficus lyrata,Fiddle-leaf fig,80,10,10,100
+0,5361899,Ficus Lyrata,Fiddle-leaf fig,80,10,10,100
 1,2868241,Monstera Deliciosa,Swiss cheese plant,80,10,10,100
 2,2868323,Epipremnum aureum,Golden pothos,76,9,11,96
 3,2985944,Kalanchoe Blossfeldiana,Flaming Katy,46,5,7,58
