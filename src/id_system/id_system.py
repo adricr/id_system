@@ -15,7 +15,7 @@ IMAGE_DIR = PROJECT_DIR / "plants1"
 PROCESSED_DIR = PROJECT_DIR / "processed"
 METADATA_PATH = IMAGE_DIR / "metadata.csv"
 
-LEARNING_RATE = 1e-3
+LEARNING_RATE = 3e-4
 BATCH_SIZE = 32
 EPOCHS = 200
 
@@ -50,14 +50,19 @@ class PlantDataset(Dataset):
         return image, label
 
 
+# Crop scale floored at 0.4 so the crop keeps enough of the plant to be identifiable
 train_transform = v2.Compose([
-    v2.RandomResizedCrop(size=(224, 224), antialias=True),
+    v2.RandomResizedCrop(size=(224, 224), scale=(0.4, 1.0), antialias=True),
     v2.RandomHorizontalFlip(p=0.5),
+    v2.RandomRotation(degrees=15),
+    v2.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.02),
     v2.ToDtype(torch.float32, scale=True),
     v2.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
 ])
+# Matches the IMAGENET1K_V1 eval preprocessing: short side to 256, then center crop
 val_transform = v2.Compose([
-    v2.Resize(size=(224, 224), antialias=True),
+    v2.Resize(size=256, antialias=True),
+    v2.CenterCrop(size=224),
     v2.ToDtype(torch.float32, scale=True),
     v2.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
 ])
@@ -74,16 +79,18 @@ def build_model(num_classes, device):
         print(f"Loaded model from {model_path} (trained for {trained_epochs} epochs so far)")
     else:
         model = mobilenet_v3_small(weights=MobileNet_V3_Small_Weights.IMAGENET1K_V1, progress=True)
-        for p in model.parameters():
-            p.requires_grad = False
         model.classifier[3] = torch.nn.Linear(model.classifier[3].in_features, num_classes)
         trained_epochs = 0
+    # Backbone frozen; only the classifier's two Linear layers train
+    for p in model.parameters():
+        p.requires_grad = False
+    model.classifier[0].requires_grad_(True)
+    model.classifier[3].requires_grad_(True)
     return model.to(device), trained_epochs
-
-
 def train_loop(dataloader, model, loss_fn, optimizer, device):
     size = len(dataloader.dataset)
     model.train()
+    model.features.eval()
     for batch, (X, y) in enumerate(dataloader):
         X, y = X.to(device), y.to(device)
         pred = model(X)
@@ -134,7 +141,7 @@ def main() -> None:
     model, trained_epochs = build_model(num_classes, device)
     loss_fn = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE)
-    early_stopping = EarlyStopping(4,0.01)
+    early_stopping = EarlyStopping(6,0.001)
     total_epochs = 0
     print(f"Let's run {EPOCHS} epochs")
     for epoch in range(trained_epochs + 1, trained_epochs + EPOCHS + 1):

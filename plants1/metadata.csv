@@ -1,12 +1,12 @@
 label_index,dir_id,species,common_name,train_count,valid_count,test_count,total_count
-0,5361899,Ficus Lyrata,Fiddle-leaf fig,80,10,10,100
-1,2868241,Monstera Deliciosa,Swiss cheese plant,80,10,10,100
+0,5361899,Ficus Lyrata,Fiddle-leaf fig,128,10,10,148
+1,2868241,Monstera Deliciosa,Swiss cheese plant,110,10,10,130
 2,2868323,Epipremnum aureum,Golden pothos,76,9,11,96
-3,2985944,Kalanchoe Blossfeldiana,Flaming Katy,46,5,7,58
-4,2765221,Tradescantia pallida,Purple heart,80,10,11,101
-5,2927096,Ocimum basilicum,Basil,79,9,11,99
-6,5362063,Crassula Ovata,Jade plant,80,10,11,101
-7,2869680,Spathiphyllum wallisii,Peace lily,75,9,10,94
+3,2985944,Kalanchoe Blossfeldiana,Flaming Katy,86,5,7,98
+4,2765221,Tradescantia pallida,Purple heart,95,10,11,116
+5,2927096,Ocimum basilicum,Basil,94,9,11,114
+6,5362063,Crassula Ovata,Jade plant,83,10,11,104
+7,2869680,Spathiphyllum wallisii,Peace lily,109,9,10,128
 8,9388529,Haworthiopsis attenuata,Zebra haworthia,27,3,4,34
 9,8315197,Echeveria Elegans,Mexican snowball,47,5,7,59
-10,2930137,Solanum lycopersicum L.,Tomato,76,10,10,96
+10,2930137,Solanum lycopersicum L.,Tomato,158,10,10,178
