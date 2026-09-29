@@ -1,7 +1,7 @@
 import torch
 from torch.utils.data import DataLoader
 import pandas as pd
-from id_system import (
+from id_system_large import (
 METADATA_PATH,
 IMAGE_DIR,
 PlantDataset,
