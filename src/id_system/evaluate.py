@@ -4,7 +4,7 @@ import pandas as pd
 import torch
 from torch.utils.data import DataLoader
 
-from id_system import (
+from id_system_large import (
     BATCH_SIZE,
     IMAGE_DIR,
     METADATA_PATH,

@@ -1,0 +1,46 @@
+[
+  {
+    "species": "Ficus Lyrata",
+    "common_name": "Fiddle-leaf fig"
+  },
+  {
+    "species": "Monstera Deliciosa",
+    "common_name": "Swiss cheese plant"
+  },
+  {
+    "species": "Epipremnum aureum",
+    "common_name": "Golden pothos"
+  },
+  {
+    "species": "Kalanchoe Blossfeldiana",
+    "common_name": "Flaming Katy"
+  },
+  {
+    "species": "Tradescantia pallida",
+    "common_name": "Purple heart"
+  },
+  {
+    "species": "Ocimum basilicum",
+    "common_name": "Basil"
+  },
+  {
+    "species": "Crassula Ovata",
+    "common_name": "Jade plant"
+  },
+  {
+    "species": "Spathiphyllum wallisii",
+    "common_name": "Peace lily"
+  },
+  {
+    "species": "Haworthiopsis attenuata",
+    "common_name": "Zebra haworthia"
+  },
+  {
+    "species": "Echeveria Elegans",
+    "common_name": "Mexican snowball"
+  },
+  {
+    "species": "Solanum lycopersicum L.",
+    "common_name": "Tomato"
+  }
+]
