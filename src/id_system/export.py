@@ -7,12 +7,12 @@ from executorch.exir import to_edge_transform_and_lower
 from executorch.runtime import Runtime
 from id_system_large import (
 METADATA_PATH,
-PROCESSED_DIR,
+PROJECT_DIR,
 build_model,
 )
-
-PTE_PATH = PROCESSED_DIR / "model_large.pte"
-LABELS_PATH = PROCESSED_DIR / "labels.json"
+EXPORTDIR = PROJECT_DIR/"export"
+PTE_PATH = EXPORTDIR / "model_large.pte"
+LABELS_PATH = EXPORTDIR / "labels.json"
 # Must match the CenterCrop size in val_transform
 INPUT_SIZE = 224
 
@@ -38,6 +38,7 @@ def main():
         partitioner=[XnnpackPartitioner()],
     ).to_executorch()
 
+    EXPORTDIR.mkdir(exist_ok=True)
     with open(PTE_PATH, "wb") as f:
         f.write(executorch_program.buffer)
     print(f"Saved {PTE_PATH} ({PTE_PATH.stat().st_size / 1e6:.1f} MB)")
